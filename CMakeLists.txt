@@ -10,6 +10,43 @@ FIND_PACKAGE(OpenCL REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 
 # --------------------------------------------------------------------------
+# OpenCV dll section
+FOREACH(target ${OpenCV_LIBRARIES})
+  IF(NOT TARGET ${target})
+    CONTINUE()
+  ENDIF()
+
+  GET_TARGET_PROPERTY(LIB_TYPE ${target} TYPE)
+
+  IF(${LIB_TYPE} STREQUAL "SHARED_LIBRARY" AND ${CMAKE_GENERATOR} MATCHES "Visual Studio")
+    GET_TARGET_PROPERTY(LIB_DEBUG_FILE ${target} IMPORTED_LOCATION_DEBUG)
+    GET_TARGET_PROPERTY(LIB_RELEASE_FILE ${target} IMPORTED_LOCATION_RELEASE)
+
+    IF(NOT LIB_DEBUG_FILE AND NOT LIB_RELEASE_FILE)
+      GET_TARGET_PROPERTY(LIB_FILE ${target} IMPORTED_LOCATION)
+      IF("${LIB_FILE}" STREQUAL "")
+        MESSAGE(STATUS "Unable to copy target ${target} to runtime directory. No file associated with target.")
+      ELSE()
+        SET(LIB_RELEASE_FILE ${LIB_FILE})
+        SET(LIB_DEBUG_FILE ${LIB_FILE})
+      ENDIF()
+    ENDIF()
+
+    IF( EXISTS ${LIB_RELEASE_FILE} )
+      FILE(COPY ${LIB_RELEASE_FILE} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release)
+    ENDIF()
+    IF( EXISTS ${LIB_DEBUG_FILE} )
+      FILE(COPY ${LIB_DEBUG_FILE} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+      # Also copy the .pdb if it exists
+      STRING(REPLACE "${CMAKE_SHARED_LIBRARY_SUFFIX}" ".pdb" LIB_DEBUG_PDB_FILE ${LIB_DEBUG_FILE})
+      IF( EXISTS ${LIB_DEBUG_PDB_FILE})
+        FILE(COPY ${LIB_DEBUG_PDB_FILE} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+      ENDIF()
+    ENDIF()
+  ENDIF()
+ENDFOREACH()
+
+# --------------------------------------------------------------------------
 # Hack section
 
 # Hack to handle #pragma comment(lib, "xyz") in ovrvision_tracking.cpp
