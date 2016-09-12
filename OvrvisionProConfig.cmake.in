@@ -1,0 +1,27 @@
+#-----------------------------------------------------------------------------
+# Configuration file for the OvrvisionPro SDK toolkit
+#
+# © Copyright 2016 Adam Rankin, Robarts Research Institute
+#
+# This file can be passed to a CMake FIND_PACKAGE call with the following syntax:
+#
+# FIND_PACKAGE(OvrvisionPro <REQUIRED|QUIET> NO_MODULE)
+#   Set the variable OvrvisionPro_DIR:PATH=@CMAKE_BINARY_DIR@
+# 
+#
+# Or you can use the following variables to configure your CMake project:
+#  OvrvisionPro_INCLUDE_DIRS - include directories for Plus headers
+#  OvrvisionPro - target to be used in a target_link_libraries(...) command
+#-----------------------------------------------------------------------------
+
+# Check for dependencies
+SET(OpenCV_DIR @OpenCV_DIR@)
+FIND_PACKAGE(OpenCV 3.1.0 REQUIRED NO_MODULE)
+FIND_PACKAGE(OpenCL REQUIRED)
+
+# Inlude the OvrvisionPro target
+SET(OvrvisionPro_TARGETS_FILE @CMAKE_BINARY_DIR@/OvrvisionProTargets.cmake)
+INCLUDE(${OvrvisionPro_TARGETS_FILE})
+
+# Tell the user project where to find our headers
+SET(OvrvisionPro_INCLUDE_DIRS "@OvrvisionPro_INCLUDE_DIRS@")
