@@ -74,6 +74,7 @@ ENDIF()
 SET( OvrvisionPro_INCLUDE_DIRS #OpenCV directories are included via CMake target system 
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/include
+  ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/OpenCL/amd/include
