@@ -4,8 +4,22 @@ cmake_minimum_required(VERSION 3.0)
 OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 # --------------------------------------------------------------------------
+# Configure output paths for libraries and executables.
+IF(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+ENDIF()
+
+IF(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+ENDIF()
+
+IF(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+ENDIF()
+
+# --------------------------------------------------------------------------
 # Ensure all dependencies are available
-FIND_PACKAGE(OpenCV 3.1.0 REQUIRED NO_MODULE)
+FIND_PACKAGE(OpenCV 3.1.0 REQUIRED NO_MODULE COMPONENTS opencv_core opencv_imgproc opencv_calib3d)
 FIND_PACKAGE(OpenCL REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 
@@ -71,7 +85,7 @@ ENDIF()
 
 # --------------------------------------------------------------------------
 # OvrvisionPro library project
-SET( OvrvisionPro_INCLUDE_DIRS #OpenCV directories are included via CMake target system 
+SET(OvrvisionPro_INCLUDE_DIRS #OpenCV directories are included via CMake target system 
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/include
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src
@@ -82,7 +96,7 @@ SET( OvrvisionPro_INCLUDE_DIRS #OpenCV directories are included via CMake target
 
 # --------------------------------------------------------------------------
 # ArUco related files
-SET( ArUco_SOURCES
+SET(ArUco_SOURCES
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco/ar_omp.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco/arucofidmarkers.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco/board.cpp
@@ -96,7 +110,7 @@ SET( ArUco_SOURCES
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco/subpixelcorner.cpp
   )
 
-SET( ArUco_HEADERS
+SET(ArUco_HEADERS
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco/ar_omp.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco/aruco.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco/arucofidmarkers.h
@@ -114,25 +128,25 @@ SET( ArUco_HEADERS
 
 # --------------------------------------------------------------------------
 # CSharp related files
-SET( OvrvisionProCSharp_SOURCES
+SET(OvrvisionProCSharp_SOURCES
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_csharp.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_csharp_unity.cpp
   )
 
 # --------------------------------------------------------------------------
 # OpenCL related files
-SET( OvrvisionProOpenCL_SOURCES
+SET(OvrvisionProOpenCL_SOURCES
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/OpenCL.cpp
   )
 
-SET( OvrvisionProOpenCL_HEADERS
+SET(OvrvisionProOpenCL_HEADERS
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/OpenCL_kernel.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/OvrvisionProCL.h
   )
 
 # --------------------------------------------------------------------------
 # Core lib files
-SET( OvrvisionPro_SOURCES
+SET(OvrvisionPro_SOURCES
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ar.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ar_metaio.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_calibration.cpp
@@ -147,7 +161,7 @@ IF(APPLE)
   LIST(APPEND OvrvisionPro_SOURCES ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_avf.m)
 ENDIF()
 
-SET( OvrvisionPro_HEADERS
+SET(OvrvisionPro_HEADERS
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_v4l.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_avf.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_calibration.h
@@ -170,12 +184,28 @@ source_group( "ArUco" FILES ${ArUco_SOURCES} ${ArUco_HEADERS} )
 source_group( "C#" FILES ${OvrvisionProCSharp_SOURCES} )
 source_group( "OpenCL" FILES ${OvrvisionProOpenCL_SOURCES} ${OvrvisionProOpenCL_HEADERS} )
 
-target_link_libraries(OvrvisionPro PUBLIC ${OpenCV_LIBRARIES} ${OpenCL_LIBRARIES} ${OPENGL_LIBRARIES})
+SET(OvrvisionPro_LIBS
+  ${OpenCV_LIBRARIES}
+  ${OpenCL_LIBRARIES}
+  ${OPENGL_LIBRARIES}
+  )
+
+target_link_libraries(OvrvisionPro PUBLIC ${OvrvisionPro_LIBS} )
 target_include_directories(OvrvisionPro PUBLIC ${OvrvisionPro_INCLUDE_DIRS})
 target_compile_definitions(OvrvisionPro PRIVATE _OVRVISION_EXPORTS) # Build the library with DLL exports defined
 target_compile_definitions(OvrvisionPro PUBLIC OPENCV_VERSION_3)
 
 export(TARGETS OvrvisionPro FILE ${CMAKE_BINARY_DIR}/OvrvisionProTargets.cmake)
+
+INSTALL(TARGETS OvrvisionPro
+  RUNTIME DESTINATION bin CONFIGURATIONS Release COMPONENT RuntimeLibraries
+  LIBRARY DESTINATION lib CONFIGURATIONS Release COMPONENT RuntimeLibraries
+  ARCHIVE DESTINATION lib CONFIGURATIONS Release COMPONENT Development
+  )
+INSTALL(FILES ${ArUco_HEADERS} ${OvrvisionProOpenCL_HEADERS} ${OvrvisionPro_HEADERS}
+  DESTINATION include
+  COMPONENT Includes
+  )
 
 # Create a OvrvisionProConfig.cmake file for use from the build tree
 CONFIGURE_FILE(OvrvisionProConfig.cmake.in

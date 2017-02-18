@@ -16,7 +16,7 @@
 
 # Check for dependencies
 SET(OpenCV_DIR @OpenCV_DIR@)
-FIND_PACKAGE(OpenCV 3.1.0 REQUIRED NO_MODULE)
+FIND_PACKAGE(OpenCV 3.1.0 REQUIRED NO_MODULE COMPONENTS opencv_core opencv_imgproc opencv_calib3d)
 FIND_PACKAGE(OpenCL REQUIRED)
 
 # Inlude the OvrvisionPro target
