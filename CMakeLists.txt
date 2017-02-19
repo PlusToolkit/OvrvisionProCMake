@@ -73,11 +73,11 @@ LINK_DIRECTORIES(${PragmaHack_DIR})
 LINK_DIRECTORIES(${OpenCV_DIR}/lib/)
 
 # Since we're hacking things... let's hack this REEAAALLLLLL good
-IF(EXISTS ${OpenCV_DIR}/lib/Debug/opencv_highgui310d.lib)
-  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/lib/Debug/opencv_highgui310d.lib ${OpenCV_DIR}/lib/Debug/opencv_highgui300d.lib)
+IF(EXISTS ${OpenCV_DIR}/lib/Debug/opencv_highgui320d.lib)
+  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/lib/Debug/opencv_highgui320d.lib ${OpenCV_DIR}/lib/Debug/opencv_highgui300d.lib)
 ENDIF()
-IF(EXISTS ${OpenCV_DIR}/lib/Release/opencv_highgui310.lib)
-  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/lib/Release/opencv_highgui310.lib ${OpenCV_DIR}/lib/Release/opencv_highgui300.lib)
+IF(EXISTS ${OpenCV_DIR}/lib/Release/opencv_highgui320.lib)
+  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/lib/Release/opencv_highgui320.lib ${OpenCV_DIR}/lib/Release/opencv_highgui300.lib)
 ENDIF()
 
 # End hack section
@@ -87,11 +87,11 @@ ENDIF()
 # OvrvisionPro library project
 SET(OvrvisionPro_INCLUDE_DIRS #OpenCV directories are included via CMake target system 
   ${CMAKE_BINARY_DIR}
+  ${OpenCL_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/include
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/aruco
-  ${CMAKE_SOURCE_DIR}/OvrvisionPro/3rdparty/OpenCL/amd/include
   )
 
 # --------------------------------------------------------------------------
