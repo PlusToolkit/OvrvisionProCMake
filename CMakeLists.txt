@@ -168,6 +168,9 @@ SET(OvrvisionPro_HEADERS
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ds.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_handimage.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_setting.h
+  ${CMAKE_SOURCE_DIR}/OvrvisionPro/include/ovrvision_ar.h
+  ${CMAKE_SOURCE_DIR}/OvrvisionPro/include/ovrvision_pro.h
+  ${CMAKE_SOURCE_DIR}/OvrvisionPro/include/ovrvision_tracking.h
   )
 
 ADD_LIBRARY(OvrvisionPro 
