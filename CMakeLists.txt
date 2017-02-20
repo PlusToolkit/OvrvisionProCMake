@@ -61,29 +61,6 @@ FOREACH(target ${OpenCV_LIBRARIES})
 ENDFOREACH()
 
 # --------------------------------------------------------------------------
-# Hack section
-
-# Hack to handle #pragma comment(lib, "xyz") in ovrvision_tracking.cpp
-LINK_DIRECTORIES(${OpenCV_DIR}/3rdparty/lib/)
-# We expect a superbuild project to pass us in the directory that contains
-#   ippicvmt.lib
-LINK_DIRECTORIES(${PragmaHack_DIR})
-# We need to link the directory that contains 
-#   opencv_highgui300d.lib (grrrr, version locked!!!)
-LINK_DIRECTORIES(${OpenCV_DIR}/lib/)
-
-# Since we're hacking things... let's hack this REEAAALLLLLL good
-IF(EXISTS ${OpenCV_DIR}/lib/Debug/opencv_highgui320d.lib)
-  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/lib/Debug/opencv_highgui320d.lib ${OpenCV_DIR}/lib/Debug/opencv_highgui300d.lib)
-ENDIF()
-IF(EXISTS ${OpenCV_DIR}/lib/Release/opencv_highgui320.lib)
-  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_DIR}/lib/Release/opencv_highgui320.lib ${OpenCV_DIR}/lib/Release/opencv_highgui300.lib)
-ENDIF()
-
-# End hack section
-# --------------------------------------------------------------------------
-
-# --------------------------------------------------------------------------
 # OvrvisionPro library project
 SET(OvrvisionPro_INCLUDE_DIRS #OpenCV directories are included via CMake target system 
   ${CMAKE_BINARY_DIR}
@@ -150,28 +127,36 @@ SET(OvrvisionPro_SOURCES
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ar.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ar_metaio.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_calibration.cpp
-  ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ds.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_pro.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_setting.cpp
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_tracking.cpp
-  ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_v4l.cpp
   )
 
-IF(APPLE)
+IF(WIN32)
+  LIST(APPEND OvrvisionPro_SOURCES ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ds.cpp)
+ELSEIF(APPLE)
   LIST(APPEND OvrvisionPro_SOURCES ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_avf.m)
+ELSEIF(UNIX)
+  LIST(APPEND OvrvisionPro_SOURCES ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_v4l.cpp)
 ENDIF()
 
 SET(OvrvisionPro_HEADERS
-  ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_v4l.h
-  ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_avf.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_calibration.h
-  ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ds.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_handimage.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_setting.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/include/ovrvision_ar.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/include/ovrvision_pro.h
   ${CMAKE_SOURCE_DIR}/OvrvisionPro/include/ovrvision_tracking.h
   )
+
+IF(WIN32)
+  LIST(APPEND OvrvisionPro_HEADERS ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_ds.h)
+ELSEIF(APPLE)
+  LIST(APPEND OvrvisionPro_HEADERS ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_avf.h)
+  LIST(APPEND OvrvisionPro_HEADERS ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_avf.m)
+ELSEIF(UNIX)
+  LIST(APPEND OvrvisionPro_HEADERS ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_v4l.h)
+ENDIF()
 
 ADD_LIBRARY(OvrvisionPro 
   ${ArUco_SOURCES} 
@@ -192,6 +177,17 @@ SET(OvrvisionPro_LIBS
   ${OpenCL_LIBRARIES}
   ${OPENGL_LIBRARIES}
   )
+
+IF(WIN32)
+  LIST(APPEND OvrvisionPro_LIBS 
+    opencv_highgui
+    Strmiids.lib
+    )
+ELSEIF(APPLE)
+  LIST(APPEND OvrvisionPro_LIBS )
+ELSEIF(UNIX)
+  LIST(APPEND OvrvisionPro_LIBS )
+ENDIF()
 
 target_link_libraries(OvrvisionPro PUBLIC ${OvrvisionPro_LIBS} )
 target_include_directories(OvrvisionPro PUBLIC ${OvrvisionPro_INCLUDE_DIRS})
