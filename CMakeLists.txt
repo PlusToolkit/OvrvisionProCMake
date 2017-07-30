@@ -19,7 +19,13 @@ ENDIF()
 
 # --------------------------------------------------------------------------
 # Ensure all dependencies are available
-FIND_PACKAGE(OpenCV 3.1.0 REQUIRED NO_MODULE COMPONENTS opencv_core opencv_imgproc opencv_calib3d)
+FIND_PACKAGE(OpenCV REQUIRED NO_MODULE COMPONENTS opencv_core opencv_imgproc opencv_calib3d)
+IF(OpenCV_VERSION VERSION_LESS 3.1.0)
+  MESSAGE(FATAL_ERROR "OpenCV >= 3.1.0 required for OvrvisionPro")
+ELSE()
+  MESSAGE(STATUS "Using OpenCV ${OpenCV_VERSION}")
+ENDIF()
+
 FIND_PACKAGE(OpenCL REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 
