@@ -164,11 +164,11 @@ ELSEIF(UNIX)
   LIST(APPEND OvrvisionPro_HEADERS ${CMAKE_SOURCE_DIR}/OvrvisionPro/src/lib_src/ovrvision_v4l.h)
 ENDIF()
 
-ADD_LIBRARY(OvrvisionPro 
-  ${ArUco_SOURCES} 
-  ${ArUco_HEADERS} 
-  ${OvrvisionProCSharp_SOURCES} 
-  ${OvrvisionProOpenCL_SOURCES} 
+ADD_LIBRARY(OvrvisionPro
+  ${ArUco_SOURCES}
+  ${ArUco_HEADERS}
+  ${OvrvisionProCSharp_SOURCES}
+  ${OvrvisionProOpenCL_SOURCES}
   ${OvrvisionProOpenCL_HEADERS}
   ${OvrvisionPro_SOURCES}
   ${OvrvisionPro_HEADERS}
@@ -179,7 +179,10 @@ source_group( "C#" FILES ${OvrvisionProCSharp_SOURCES} )
 source_group( "OpenCL" FILES ${OvrvisionProOpenCL_SOURCES} ${OvrvisionProOpenCL_HEADERS} )
 
 SET(OvrvisionPro_LIBS
-  ${OpenCV_LIBRARIES}
+  opencv_core
+  opencv_calib3d
+  opencv_imgproc
+  opencv_ml
   ${OpenCL_LIBRARIES}
   ${OPENGL_LIBRARIES}
   )
